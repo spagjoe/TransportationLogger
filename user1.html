@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Logger</title>
+
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+        body {
+            background-color: #333; /* Dark gray background */
+            color: #fff; /* White text color */
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .toggle-button {
+            font-size: 30px; /* Increase font size */
+            padding: 40px 30px; /* Increase button height and padding */
+            margin: 5px;
+            display: block; /* Ensure buttons are stacked vertically */
+            width: 100%; /* Make buttons take full width */
+        }
+
+        .toggle-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .submit-button {
+            font-size: 25px; /* Increase font size */
+            padding: 30px 30px; /* Increase button height and padding */
+            margin-top: 20px;
+        }
+        
+        label {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row button-container">
+            <div class="col-md-6">
+                <div class="text-center">
+                    <label>From:</label>
+                </div>
+                <!-- Toggleable Buttons for "From:" -->
+                <button class="btn btn-secondary toggle-button from" onclick="selectFrom('Gillette')">Gillette</button>
+                <button class="btn btn-secondary toggle-button from" onclick="selectFrom('Millington')">Millington</button>
+                <button class="btn btn-secondary toggle-button from" onclick="selectFrom('Central')">Central</button>
+            </div>
+
+            <div class="col-md-6">
+                <div class="text-center">
+                    <label>To:</label>
+                </div>
+                <!-- Toggleable Buttons for "To:" -->
+                <button class="btn btn-secondary toggle-button to" onclick="selectTo('Gillette')">Gillette</button>
+                <button class="btn btn-secondary toggle-button to" onclick="selectTo('Millington')">Millington</button>
+                <button class="btn btn-secondary toggle-button to" onclick="selectTo('Central')">Central</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary submit-button" onclick="submitForm()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-absolute bottom-0 end-0">
+      <div class="toast bg-success text-white" id="submitToast" data-delay="5000">
+        <div class="toast-header">
+          Trip Logger
+        </div>
+        <div class="toast-body">
+          Trip logged! Please wait a moment before submitting another trip.
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Bootstrap JS and Popper.js scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        var selectedFrom;
+        var selectedTo;
+
+        function selectFrom(from) {
+            selectedFrom = from;
+            updateButtonState('.toggle-button.from', from);
+        }
+
+        function selectTo(to) {
+            selectedTo = to;
+            updateButtonState('.toggle-button.to', to);
+        }
+
+        function updateButtonState(selector, selectedValue) {
+            const buttons = document.querySelectorAll(selector);
+            buttons.forEach((btn) => {
+                btn.classList.toggle('active', btn.textContent === selectedValue);
+            });
+        }
+
+        function submitForm() {
+          console.log("TO: " + selectedTo)
+          console.log("FROM: " + selectedFrom)
+            if (selectedFrom && selectedTo && selectedFrom != selectedTo) {
+                google.script.run.logTrip('USER1 SHEET', new Date().toLocaleDateString('en-US'), selectedFrom, selectedTo);
+                console.log("Trip successfully logged. Please wait at least 5 seconds before submitting another trip.");
+                
+                var submitToast = document.getElementById('submitToast');
+                var submitAlert = new bootstrap.Toast(submitToast);
+                submitAlert.show();
+            } else {
+                console.log('Please select "From" and "To" values before submitting.');
+            }
+        }
+    </script>
+</body>
+</html>
